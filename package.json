@@ -13,5 +13,10 @@
     "url": "https://github.com/aaronhuggins/promise-workers.git"
   },
   "author": "Aaron Huggins",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "local-web-server": "^4.0.0",
+    "mocha": "^7.1.0"
+  }
 }
