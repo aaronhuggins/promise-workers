@@ -6,7 +6,7 @@
   "types": "index.d.ts",
   "scripts": {
     "test": "node test.js",
-    "build": "node make.js"
+    "build": "node make-web.js"
   },
   "repository": {
     "type": "git",
