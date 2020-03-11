@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Promises + Workers = multi-threaded PromiseWorkers!",
   "main": "index.js",
+  "module": "index.esm.js",
   "types": "index.d.ts",
   "scripts": {
     "test": "node test.js",
