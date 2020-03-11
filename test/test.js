@@ -17,7 +17,7 @@ const calculatePrimes = function calculatePrimes (max) {
     }
 
     return primes
-  }, { workerData: max })
+  }, max)
 }
 
 describe('class PromiseWorker', () => {
@@ -31,7 +31,7 @@ describe('class PromiseWorker', () => {
     const msg = 'Darmok and Jalad at Tanagra.'
     return new PromiseWorker((resolve, reject) => {
       resolve(workerData)
-    }, { workerData: msg }).then((result) => {
+    }, msg).then((result) => {
       chai.expect(result).to.eql(msg)
     })
   })

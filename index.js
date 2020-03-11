@@ -1,5 +1,5 @@
 class PromiseWorker extends Promise {
-  constructor (executor, { workerData } = {}) {
+  constructor (executor, workerData) {
     let Worker
     let workerFunc = `
       if (typeof postMessage === 'undefined') {

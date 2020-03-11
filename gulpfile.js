@@ -30,3 +30,5 @@ gulp.task('compile:esm-test', async () => {
 gulp.task('compile:esm', async () => {
   fs.writeFileSync('./index.esm.js', `export ${PromiseWorker.toString()}\n`, 'utf8')
 })
+
+gulp.task('compile', gulp.parallel('compile:esm', 'compile:esm-test'))
