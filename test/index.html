@@ -1,28 +1,24 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <title>Tests</title>
-  <link href="../node_modules/mocha/mocha.css" rel="stylesheet" />
-  <script src="../node_modules/mocha/mocha.js"></script>
-  <script src="../node_modules/chai/chai.js"></script>
-  <script type="module" src="../index.esm.js"></script>
-</head>
-<body>
-
-  <!-- A container element for the visual Mocha results -->
-  <div id="mocha"></div>
-
-  <!-- Mocha setup and initiation code -->
-  <script>
-  mocha.setup('bdd');
-  window.onload = function() {
-    mocha.run();
-  };
-  </script>
-
-  <!-- The script under test -->
-  <script type="module" src="index.js"></script>
-
-</body>
+  <head>
+    <meta charset="utf-8">
+    <title>Tests</title>
+    <link href="../node_modules/mocha/mocha.css" rel="stylesheet" />
+    <script src="../node_modules/mocha/mocha.js"></script>
+    <script src="../node_modules/chai/chai.js"></script>
+    <script type="module" src="../index.esm.js"></script>
+  </head>
+  <body>
+    <!-- A container element for the visual Mocha results -->
+    <div id="mocha"></div>
+    <!-- Mocha setup and initiation code -->
+    <script>
+    mocha.setup('bdd');
+    window.onload = function() {
+      mocha.run();
+    };
+    </script>
+    <!-- The script under test -->
+    <script type="module" src="test-esm.js"></script>
+  </body>
 </html>

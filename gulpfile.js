@@ -17,6 +17,16 @@ gulp.task('test:web', () => {
 
 gulp.task('test', gulp.series('test:node', 'test:web'))
 
+gulp.task('compile:esm-test', async () => {
+  const testScript = fs.readFileSync('./test/test.js', 'utf8')
+  const esmTestScript = [
+    'import { PromiseWorker } from \'../index.esm.js\'',
+    ...testScript.split(/\r\n|\n|\r/).filter((line) => !line.includes('require('))
+  ]
+
+  fs.writeFileSync('./test/test-esm.js', esmTestScript.join('\n'), 'utf8')
+})
+
 gulp.task('compile:esm', async () => {
   fs.writeFileSync('./index.esm.js', `export ${PromiseWorker.toString()}\n`, 'utf8')
 })
