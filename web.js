@@ -19,20 +19,20 @@ export class PromiseWorker extends Promise {
         const workerThreads = require('worker_threads')
         const workerData = workerThreads.workerData
         new Promise(${executor.toString()})
-          .then((result) => {
+          .then(function (result) {
             workerThreads.parentPort.postMessage(result)
           })
-          .catch((error) => {
+          .catch(function (error) {
             workerThreads.parentPort.postMessage(error)
           })
       } else {
         onmessage = function (event) {
           const workerData = event.data
           new Promise(${executor.toString()})
-            .then((result) => {
+            .then(function (result) {
               postMessage(result)
             })
-            .catch((error) => {
+            .catch(function (error) {
               postMessage(error)
             })
         }
@@ -47,22 +47,36 @@ export class PromiseWorker extends Promise {
       workerFunc = window.URL.createObjectURL(new window.Blob([workerFunc], { type: 'application/js' }))
     }
 
-    super((resolve, reject) => {
+    super(function (resolve, reject) {
       const worker = new Worker(workerFunc, { workerData, eval: true })
-      const exitCode = (code) => {
-        if (code !== 0) {
-          reject(new Error(`Worker stopped with exit code ${code}`))
-        }
-      }
       if (typeof worker.on === 'undefined') {
-        worker.onmessage = (event) => { resolve(event.data) }
-        worker.onerror = (event) => { reject(event) }
-        worker.onmessageerror = (event) => { reject(event) }
+        worker.onmessage = function onmessage (event) {
+          resolve(event.data)
+          worker.terminate()
+        }
+        worker.onerror = function onerror (event) {
+          reject(event)
+          worker.terminate()
+        }
+        worker.onmessageerror = function onmessageerror (event) {
+          reject(event)
+          worker.terminate()
+        }
         worker.postMessage(workerData)
       } else {
-        worker.on('message', resolve)
-        worker.on('error', reject)
-        worker.on('exit', exitCode)
+        worker.on('message', function (data) {
+          resolve(data)
+          worker.terminate()
+        })
+        worker.on('error', function (error) {
+          resolve(error)
+          worker.terminate()
+        })
+        worker.on('exit', function (exitCode) {
+          if (exitCode !== 0) {
+            reject(new Error(`Worker stopped with exit code ${exitCode}`))
+          }
+        })
       }
     })
   }
