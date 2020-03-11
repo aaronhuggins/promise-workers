@@ -1,4 +1,5 @@
-const { PromiseWorker } = require('./index.js')
+const chai = require('chai')
+const { PromiseWorker } = require('../index.js')
 
 const calculatePrimes = function calculatePrimes (max) {
   return new PromiseWorker(function (workerData) {
