@@ -1,13 +1,17 @@
 {
   "name": "promise-workers",
-  "version": "0.1.0",
-  "description": "",
+  "version": "1.0.0",
+  "description": "Promises + Workers = multi-threaded PromiseWorkers!",
   "main": "index.js",
   "types": "index.d.ts",
   "scripts": {
     "test": "node test.js",
     "build": "node make.js"
   },
-  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aaronhuggins/promise-workers.git"
+  },
+  "author": "Aaron Huggins",
   "license": "MIT"
 }
