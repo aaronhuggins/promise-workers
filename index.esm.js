@@ -5,11 +5,11 @@ export class PromiseWorker extends Promise {
       if (typeof postMessage === 'undefined') {
         const workerThreads = require('worker_threads')
         const workerData = workerThreads.workerData
-        workerThreads.parentPort.postMessage((${executor.toString()})(workerData))
+        workerThreads.parentPort.postMessage((${executor.toString()})())
       } else {
         onmessage = function (event) {
           const workerData = event.data
-          postMessage((${executor.toString()})(workerData))
+          postMessage((${executor.toString()})())
         }
       }`
 
