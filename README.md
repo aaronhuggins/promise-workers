@@ -1,19 +1,18 @@
 # Promise Workers
 
-Promises and Async/Await patterns have greatly improved multi-tasking in JavaScript. With the inroduction of Web Workers and Node.JS Worker Threads, true multi-threading became a reality as well. This library aims to combine these two dynamically to provide easy-to-use asynchrony as class `PromiseWorker` and pooling using `Promise.all` for threads.
+Promises and Async/Await patterns have greatly improved multi-tasking in JavaScript. With the inroduction of Web Workers and Node.JS Worker Threads, true multi-threading became a reality as well. This library aims to combine these two dynamically to provide single-task, easy-to-use asynchrony, and pooling (using `PromiseWorker.all`) for threads.
 
 ## Usage
 
 The library is usable in browsers and Node.JS. There are some differences which are explained below.
 
 - Node.JS: `const { PromiseWorker } = require('promise-workers')`
-- Browser: `<script type="module" src="web.js"></script>`
-- Tree-shaking: `import { PromiseWorker } from 'promise-workers/web.js'`
+- Tree-shaking: `import { PromiseWorker } from 'promise-workers/index.esm.js'`
 
 ```javascript
 function workToDo (input) {
-  return new PromiseWorker(function (workerData) {
-    const data = workerData
+  return new PromiseWorker(function () {
+    const data = workerData // Variable workerData is assigned as a constant in the worker context.
 
     // Perform CPU intensive work...
 
@@ -37,23 +36,43 @@ main()
 
 ## API
 
-### `new PromiseWorker(executor: () => any | void)`
+The `PromiseWorker` constructor accepts two arguments.
+- `executor`: **Required** The function passed to the worker for execution.
+- `workerData`: **Optional** Any JavaScript value which will be cloned to the worker as a local `workerData` variable.
 
-### `new PromiseWorker(executor: () => any | void, input: { workerData: any })`
+The `executor` function should be written as if it is self-contained code. It will be executed in the context of the worker and will only have access to the context of its own thread. The variable `workerData` is initialized as a constant in the worker context and cannot be re-assigned by the `executor` function. The `executor` function cannot reference anything from the thread that which spawns the `PromiseWorker`.
 
-### `new PromiseWorker(executor: (workerData: any) => any | void)`
+### new PromiseWorker(executor: () => any | void)
 
-### `new PromiseWorker(executor: (workerData: any) => any | void, input: { workerData: any })`
+Creates a worker with a synchronous function.
 
-### `new PromiseWorker(executor: (resolve: (value?: unknown) => void, reject: (reason?: any) => void) => void)`
+### new PromiseWorker(executor: () => any | void, workerData: any)
 
-### `new PromiseWorker(executor: (resolve: (value?: unknown) => void, reject: (reason?: any) => void) => void, input: { workerData: any })`
+Creates a worker with a synchronous function; passes data to the local context as `const workerData`.
+
+### new PromiseWorker(executor: (resolve: (value?: unknown) => void, reject: (reason?: any) => void) => void)
+
+Creates a worker with a Promise to fulfill.
+
+### new PromiseWorker(executor: (resolve: (value?: unknown) => void, reject: (reason?: any) => void) => void, workerData: any)
+
+Creates a worker with a Promise to fulfill; passes data to the local context as `const workerData`.
 
 ## Supported Platforms and Differences
 
-Web browsers and Node are supported by this library. This is limited to the availability and implementation of Workers on each platform.
+Web browsers and Node are supported by this library. This is limited to the availability and implementation of class `Worker` on each platform.This library has been tested working in Chrome 80.0.3987.132, Firefox 68.6.0esr, and Edge 44.18362.449.0.
 
+### Difference In Behavior
 |Platform|Versions|Async Function Resolve Value|Sync Function Resolve Value|Reject Error|
 |--------|--------|----------------------------|---------------------------|------------|
 |Node|`12.x`, `13.x`|The value passed to `resolve()`|The function return value|Value passed to `reject()` or a JS `Error`|
 |Browser|[See MDN docs](https://developer.mozilla.org/en-US/docs/Web/API/Worker/Worker)|The value passed to `resolve()`\*|The function return value\*|An `ErrorEvent` object|
+
+### Differences In Features
+|*Feature*|Node|Browser|
+|---------|----|-------|
+|Functions and Classes|[Node Docs](https://nodejs.org/api/worker_threads.html#worker_threads_class_worker)|[MDN Docs](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Functions_and_classes_available_to_workers)|
+
+## Contributors
+
+- Aaron Huggins

@@ -2,12 +2,14 @@
   "name": "promise-workers",
   "version": "1.0.0",
   "description": "Promises + Workers = multi-threaded PromiseWorkers!",
+  "keywords": ["nodejs", "async", "promise", "worker_threads", "worker", "thread", "pool", "threadpool", "multi threading"],
   "main": "index.js",
   "module": "index.esm.js",
   "types": "index.d.ts",
   "scripts": {
-    "test": "node test.js",
-    "build": "node make-web.js"
+    "prepublish": "gulp compile",
+    "test": "gulp test",
+    "build": "gulp compile"
   },
   "repository": {
     "type": "git",
