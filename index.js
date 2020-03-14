@@ -85,7 +85,7 @@ class PromiseWorker extends Promise {
   }
 
   static race () {
-    throw new Error('Not implemented or recommended; manually call Promse.race() tp ignore this error.')
+    throw new Error('Not implemented or recommended; manually call Promise.race() to ignore this error.')
   }
 
   static reject(reason) {
@@ -105,4 +105,6 @@ class PromiseWorker extends Promise {
   }
 }
 
-module.exports = { PromiseWorker }
+if (typeof window === 'undefined') {
+  module.exports = { PromiseWorker }
+}

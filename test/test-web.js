@@ -1,4 +1,3 @@
-import { PromiseWorker } from '../index.esm.js'
 
 const calculatePrimes = function calculatePrimes (max) {
   return new PromiseWorker(function () {
