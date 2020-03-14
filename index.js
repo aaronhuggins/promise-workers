@@ -1,84 +1,99 @@
 class PromiseWorker extends Promise {
   constructor (executor, workerData) {
-    let Worker
-    let workerFunc = `
-      if (typeof postMessage === 'undefined') {
-        const workerThreads = require('worker_threads')
-        const workerData = workerThreads.workerData
-        workerThreads.parentPort.postMessage((${executor.toString()})())
-      } else {
-        onmessage = function (event) {
-          const workerData = event.data
-          postMessage((${executor.toString()})())
-        }
-      }`
-
-    if (executor.length === 2) {
-      workerFunc = `
-      if (typeof postMessage === 'undefined') {
-        const workerThreads = require('worker_threads')
-        const workerData = workerThreads.workerData
-        new Promise(${executor.toString()})
-          .then(function (result) {
-            workerThreads.parentPort.postMessage(result)
-          })
-          .catch(function (error) {
-            workerThreads.parentPort.postMessage(error)
-          })
-      } else {
-        onmessage = function (event) {
-          const workerData = event.data
-          new Promise(${executor.toString()})
-            .then(function (result) {
-              postMessage(result)
-            })
-            .catch(function (error) {
-              postMessage(error)
-            })
-        }
-      }`
-    }
-
-    if (typeof window === 'undefined') {
-      const workerThreads = require('worker_threads')
-      Worker = workerThreads.Worker
-    } else {
-      Worker = window.Worker
-      workerFunc = window.URL.createObjectURL(new window.Blob([workerFunc], { type: 'application/js' }))
-    }
-
     super(function (resolve, reject) {
-      const worker = new Worker(workerFunc, { workerData, eval: true })
-      if (typeof worker.on === 'undefined') {
-        worker.onmessage = function onmessage (event) {
-          resolve(event.data)
+      if (typeof window === 'undefined') {
+        const workerFunc = executor.length === 2
+          ? 'const workerThreads = require(\'worker_threads\')\n' +
+            'const workerData = workerThreads.workerData\n' +
+            'new Promise(' + executor.toString() + ')\n' +
+            '  .then(function (result) {\n' +
+            '    workerThreads.parentPort.postMessage(result)\n' +
+            '  })\n' +
+            '  .catch(function (error) {\n' +
+            '    workerThreads.parentPort.postMessage(error)\n' +
+            '  })'
+          : 'const workerThreads = require(\'worker_threads\')\n' +
+            'const workerData = workerThreads.workerData\n' +
+            'workerThreads.parentPort.postMessage((' + executor.toString() + ')())'
+        const { Worker } = require('worker_threads')
+        const worker = new Worker(
+          workerFunc,
+          { workerData, eval: true }
+        )
+
+        worker.addListener('message', function (data) {
           worker.terminate()
-        }
-        worker.onerror = function onerror (event) {
-          reject(event)
-          worker.terminate()
-        }
-        worker.onmessageerror = function onmessageerror (event) {
-          reject(event)
-          worker.terminate()
-        }
-        worker.postMessage(workerData)
-      } else {
-        worker.on('message', function (data) {
           resolve(data)
+        }).addListener('error', function (error) {
           worker.terminate()
-        })
-        worker.on('error', function (error) {
           resolve(error)
-          worker.terminate()
-        })
-        worker.on('exit', function (exitCode) {
+        }).addListener('exit', function (exitCode) {
           if (exitCode !== 0) {
             reject(new Error(`Worker stopped with exit code ${exitCode}`))
           }
         })
+      } else {
+        const workerFunc = executor.length === 2
+          ? 'onmessage = function (event) {\n' +
+            '  const workerData = event.data\n' +
+            '  new Promise(' + executor.toString() + ')\n' +
+            '    .then(function (result) {\n' +
+            '      postMessage(result)\n' +
+            '    })\n' +
+            '    .catch(function (error) {\n' +
+            '      postMessage(error)\n' +
+            '    })\n' +
+            '}'
+          : 'onmessage = function (event) {\n' +
+            '  const workerData = event.data\n' +
+            '  postMessage((' + executor.toString() + ')())\n' +
+            '}'
+        const worker = new window.Worker(
+          window
+            .URL
+            .createObjectURL(
+              new window.Blob(
+                [workerFunc],
+                { type: 'application/js' }
+              )
+            )
+        )
+
+        worker.onmessage = function onmessage (event) {
+          worker.terminate()
+          resolve(event.data)
+        }
+        worker.onerror = function onerror (event) {
+          worker.terminate()
+          reject(event)
+        }
+        worker.onmessageerror = function onmessageerror (event) {
+          worker.terminate()
+          reject(event)
+        }
+        worker.postMessage(workerData)
       }
     })
+  }
+
+  static all (values) {
+    return Promise.all(values)
+  }
+
+  static allSettled (values) {
+    return Promise.allSettled(values)
+  }
+
+  static race () {
+    throw new Error('Not implemented or recommended; manually call Promse.race() tp ignore this error.')
+  }
+
+  static reject(reason) {
+    return Promise.reject(reason)
+  }
+
+  static resolve(value) {
+    return Promise.resolve(value)
   }
 
   static get [Symbol.species] () {
