@@ -16,6 +16,11 @@
   "main": "index.js",
   "module": "index.esm.js",
   "types": "index.d.ts",
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "index.esm.js"
+  ],
   "scripts": {
     "prepublish": "gulp compile",
     "test": "gulp test",
