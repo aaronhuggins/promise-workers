@@ -36,6 +36,7 @@
     "chai": "^4.2.0",
     "gulp": "^4.0.2",
     "local-web-server": "^4.0.0",
+    "minimist": "^1.2.5",
     "mocha": "^7.1.0"
   }
 }
