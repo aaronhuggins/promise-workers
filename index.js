@@ -89,6 +89,7 @@ class PromiseWorker extends Promise {
   }
 
   static reject(reason) {
+    new Promise().catch()
     return Promise.reject(reason)
   }
 
