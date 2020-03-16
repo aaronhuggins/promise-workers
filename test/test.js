@@ -2,7 +2,7 @@ const chai = require('chai')
 const { PromiseWorker } = require('../index.js')
 
 const calculatePrimes = function calculatePrimes (max) {
-  return new PromiseWorker(function () {
+  return new PromiseWorker(function (resolve, reject) {
     const max = workerData
     const store = []
     const primes = []
@@ -16,23 +16,17 @@ const calculatePrimes = function calculatePrimes (max) {
       }
     }
 
-    return primes
-  }, max)
+    resolve(primes)
+  }, { workerData: max })
 }
 
 describe('class PromiseWorker', () => {
-  it('should run sync function in thread', () => {
-    return calculatePrimes(12).then((result) => {
-      chai.expect(result).to.eql([2, 3, 5, 7, 11])
-    })
-  })
-
   it('should run async function in thread', () => {
     const msg = 'Darmok and Jalad at Tanagra.'
 
     return new PromiseWorker((resolve, reject) => {
       resolve(workerData)
-    }, msg).then((result) => {
+    }, { workerData: msg }).then((result) => {
       chai.expect(result).to.eql(msg)
     })
   })
@@ -40,14 +34,9 @@ describe('class PromiseWorker', () => {
   it('should run pool of async workers', () => {
     const maxValues = [
       21999917,
-      10993,
       11,
-      1999891,
-      21999917,
       10993,
       1999891,
-      11999989,
-      11,
       11999989
     ]
 
@@ -58,4 +47,24 @@ describe('class PromiseWorker', () => {
         chai.expect(result).to.eql(maxValues)
       })
   }).timeout(3500)
+
+  it('should race pool of async workers versus array of Promises', () => {
+    const maxValues = [
+      21999917,
+      11,
+      10993,
+      1999891,
+      11999989,
+      21999917,
+      1999891
+    ]
+
+    return Promise.race([
+      PromiseWorker.all(maxValues.map((maxValue) => calculatePrimes(maxValue))).then(() => 'PromiseWorker'),
+      Promise.all(maxValues.map((maxValue) => calculatePrimes(maxValue))).then(() => 'Promise')
+    ])
+      .then((result) => {
+        chai.expect(result).to.eql('PromiseWorker')
+      })
+  }).timeout(4500)
 })

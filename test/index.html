@@ -6,7 +6,7 @@
     <link href="../node_modules/mocha/mocha.css" rel="stylesheet" />
     <script src="../node_modules/mocha/mocha.js"></script>
     <script src="../node_modules/chai/chai.js"></script>
-    <script src="../index.js"></script>
+    <script type="module" src="../esm/index.js"></script>
   </head>
   <body>
     <!-- A container element for the visual Mocha results -->
@@ -19,6 +19,6 @@
     };
     </script>
     <!-- The script under test -->
-    <script src="test-web.js"></script>
+    <script type="module" src="test-web.js"></script>
   </body>
 </html>
