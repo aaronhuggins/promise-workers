@@ -87,7 +87,11 @@ Web browsers and Node are supported by this library. This is limited to the avai
 |Platform|Versions|Async Function Resolve Value|Sync Function Resolve Value|Reject Error|
 |--------|--------|----------------------------|---------------------------|------------|
 |Node|`12.x`, `13.x`|The value passed to `resolve()`|The function return value|Value passed to `reject()` or a JS `Error`|
-|Browser|[See MDN docs](https://developer.mozilla.org/en-US/docs/Web/API/Worker/Worker)|The value passed to `resolve()`\*|The function return value\*|An `ErrorEvent` object|
+|Browser|[See MDN docs](https://developer.mozilla.org/en-US/docs/Web/API/Worker/Worker)|The value\* passed to `resolve()`\*\*|The function return value\*|An `ErrorEvent` object|
+
+\* The value is explicitly taken from the `MessageEvent.data` property, instead of returning the whole `MessageEvent`.
+
+\*\* It is expected that the user will write their code so that the executor passes a value to `resolve` and/or `reject`.
 
 ### Differences In Features
 |*Feature*|Node|Browser|
