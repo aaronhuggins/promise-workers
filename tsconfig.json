@@ -5,8 +5,16 @@
     "noImplicitAny": true,
     "removeComments": true,
     "preserveConstEnums": true,
-    "outDir": "./dist/",
-    "sourceMap": true
+    "sourceMap": false,
+    "declaration": true,
+    "lib": ["DOM", "ES2018"],
+    "target": "ES2018",
+    "types": [
+      "node"
+    ],
+    "typeRoots": [
+      "node_modules/@types"
+    ]
   },
   "include": ["index.ts", "src/**/*"],
   "exclude": ["node_modules", "test/**/*"]
