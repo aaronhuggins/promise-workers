@@ -7,11 +7,11 @@ export class PromiseWorker<T> implements Promise<T> {
     options: PromiseWorkerOptions
   ) {
     const { workerData } = this._internalOptions = options
-    const self = this
+    const thisRef = this
 
     this._internalPromise = new Promise(function (resolve, reject) {
       if (typeof window === 'undefined') {
-        self._internalScript =
+        thisRef._internalScript =
           'const workerThreads = require(\'worker_threads\')\n' +
           'const workerData = workerThreads.workerData\n' +
           'new Promise(' + executor.toString() + ')\n' +
@@ -22,23 +22,23 @@ export class PromiseWorker<T> implements Promise<T> {
           '    workerThreads.parentPort.postMessage({ __promise_worker_error: error })\n' +
           '  })'
         const { Worker } = require('worker_threads')
-        self._internalWorker = new Worker(
-          self._internalScript,
+        thisRef._internalWorker = new Worker(
+          thisRef._internalScript,
           {
-            ...self._internalOptions,
+            ...thisRef._internalOptions,
             eval: true
           }
         )
 
-        self._internalWorker.addListener('message', function (data: T | PromiseWorkerError) {
-          self._internalWorker.terminate()
+        thisRef._internalWorker.addListener('message', function (data: T | PromiseWorkerError) {
+          thisRef._internalWorker.terminate()
           if (typeof (data as PromiseWorkerError).__promise_worker_error === 'undefined') {
             resolve(data as T)
           } else {
             reject((data as PromiseWorkerError).__promise_worker_error)
           }
         }).addListener('error', function (error: any) {
-          self._internalWorker.terminate()
+          thisRef._internalWorker.terminate()
           resolve(error)
         }).addListener('exit', function (exitCode: number) {
           if (exitCode !== 0) {
@@ -46,7 +46,7 @@ export class PromiseWorker<T> implements Promise<T> {
           }
         })
       } else {
-        self._internalScript =
+        thisRef._internalScript =
           'onmessage = function (event) {\n' +
           '  const workerData = event.data\n' +
           '  new Promise(' + executor.toString() + ')\n' +
@@ -57,43 +57,43 @@ export class PromiseWorker<T> implements Promise<T> {
           '      postMessage({ __promise_worker_error: error })\n' +
           '    })\n' +
           '}'
-        self._internalWorker = new window.Worker(
+        thisRef._internalWorker = new window.Worker(
           window
             .URL
             .createObjectURL(
               new window.Blob(
-                [self._internalScript],
+                [thisRef._internalScript],
                 { type: 'application/js' }
               )
             ),
-          self._internalOptions as WorkerOptions
+          thisRef._internalOptions as WorkerOptions
         )
 
-        self._internalWorker.onmessage = function onmessage (event: MessageEvent) {
-          self._internalWorker.terminate()
+        thisRef._internalWorker.onmessage = function onmessage (event: MessageEvent) {
+          thisRef._internalWorker.terminate()
           if (typeof (event.data as PromiseWorkerError).__promise_worker_error === 'undefined') {
             resolve(event.data as T)
           } else {
             reject((event.data as PromiseWorkerError).__promise_worker_error)
           }
         }
-        self._internalWorker.onerror = function onerror (event: ErrorEvent) {
-          self._internalWorker.terminate()
+        thisRef._internalWorker.onerror = function onerror (event: ErrorEvent) {
+          thisRef._internalWorker.terminate()
           reject(event)
         }
-        self._internalWorker.onmessageerror = function onmessageerror (event: ErrorEvent) {
-          self._internalWorker.terminate()
+        thisRef._internalWorker.onmessageerror = function onmessageerror (event: ErrorEvent) {
+          thisRef._internalWorker.terminate()
           reject(event)
         }
-        self._internalWorker.postMessage(workerData)
+        thisRef._internalWorker.postMessage(workerData)
       }
     })
   }
 
-  private _internalPromise: Promise<T>
-  private _internalWorker: Worker | any
-  private _internalScript: string
-  private _internalOptions: PromiseWorkerOptions
+  protected _internalPromise: Promise<T>
+  protected _internalWorker: Worker | any
+  protected _internalScript: string
+  protected _internalOptions: PromiseWorkerOptions
 
   get [Symbol.toStringTag] (): string {
     return 'PromiseWorker'
