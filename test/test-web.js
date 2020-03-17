@@ -60,7 +60,22 @@ describe('class PromiseWorker', () => {
 
     return Promise.race([
       PromiseWorker.all(maxValues.map((maxValue) => calculatePrimes(maxValue))).then(() => 'PromiseWorker'),
-      Promise.all(maxValues.map((maxValue) => calculatePrimes(maxValue))).then(() => 'Promise')
+      Promise.all(maxValues.map((maxValue) => new Promise(function (resolve, reject) {
+        const max = maxValue
+        const store = []
+        const primes = []
+    
+        for (let i = 2; i <= max; i++) {
+          if (!store[i]) {
+            primes.push(i)
+            for (let j = i << 1; j <= max; j += i) {
+              store[j] = true
+            }
+          }
+        }
+    
+        resolve(primes)
+      }))).then(() => 'Promise')
     ])
       .then((result) => {
         chai.expect(result).to.eql('PromiseWorker')
