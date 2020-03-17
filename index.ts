@@ -19,7 +19,7 @@ export class PromiseWorker<T> implements Promise<T> {
           '    workerThreads.parentPort.postMessage(result)\n' +
           '  })\n' +
           '  .catch(function (error) {\n' +
-          '    workerThreads.parentPort.postMessage(error)\n' +
+          '    workerThreads.parentPort.postMessage({ __promise_worker_error: error })\n' +
           '  })'
         const { Worker } = require('worker_threads')
         self._internalWorker = new Worker(
@@ -30,9 +30,13 @@ export class PromiseWorker<T> implements Promise<T> {
           }
         )
 
-        self._internalWorker.addListener('message', function (data: T) {
+        self._internalWorker.addListener('message', function (data: T | PromiseWorkerError) {
           self._internalWorker.terminate()
-          resolve(data)
+          if (typeof (data as PromiseWorkerError).__promise_worker_error === 'undefined') {
+            resolve(data as T)
+          } else {
+            reject((data as PromiseWorkerError).__promise_worker_error)
+          }
         }).addListener('error', function (error: any) {
           self._internalWorker.terminate()
           resolve(error)
@@ -50,7 +54,7 @@ export class PromiseWorker<T> implements Promise<T> {
           '      postMessage(result)\n' +
           '    })\n' +
           '    .catch(function (error) {\n' +
-          '      postMessage(error)\n' +
+          '      postMessage({ __promise_worker_error: error })\n' +
           '    })\n' +
           '}'
         self._internalWorker = new window.Worker(
@@ -67,7 +71,11 @@ export class PromiseWorker<T> implements Promise<T> {
 
         self._internalWorker.onmessage = function onmessage (event: MessageEvent) {
           self._internalWorker.terminate()
-          resolve(event.data)
+          if (typeof (event.data as PromiseWorkerError).__promise_worker_error === 'undefined') {
+            resolve(event.data as T)
+          } else {
+            reject((event.data as PromiseWorkerError).__promise_worker_error)
+          }
         }
         self._internalWorker.onerror = function onerror (event: ErrorEvent) {
           self._internalWorker.terminate()
@@ -138,4 +146,8 @@ export class PromiseWorker<T> implements Promise<T> {
 export interface PromiseWorkerOptions {
   workerData?: any,
   [option: string]: any
+}
+
+export interface PromiseWorkerError {
+  __promise_worker_error: any
 }
