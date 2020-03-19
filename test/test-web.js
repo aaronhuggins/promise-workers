@@ -64,7 +64,7 @@ describe('class PromiseWorker', () => {
         const max = maxValue
         const store = []
         const primes = []
-    
+
         for (let i = 2; i <= max; i++) {
           if (!store[i]) {
             primes.push(i)
@@ -73,7 +73,7 @@ describe('class PromiseWorker', () => {
             }
           }
         }
-    
+
         resolve(primes)
       }))).then(() => 'Promise')
     ])
