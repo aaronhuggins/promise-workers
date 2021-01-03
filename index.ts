@@ -1,10 +1,10 @@
-export class PromiseWorker<T> implements Promise<T> {
+export class PromiseWorker<T = any> implements Promise<T> {
   constructor (
     executor: (
       resolve: (value?: unknown) => void,
       reject: (reason?: any) => void
     ) => void,
-    options: PromiseWorkerOptions
+    options: PromiseWorkerOptions<T>
   ) {
     const { workerData } = this._internalOptions = options
     const thisRef = this
@@ -127,11 +127,11 @@ export class PromiseWorker<T> implements Promise<T> {
     return Promise
   }
 
-  static all(values: readonly any[]): Promise<any[]> {
+  static all<A = any>(values: readonly (A | Promise<A>)[]): Promise<A[]> {
     return Promise.all(values)
   }
 
-  static allSettled(values: readonly any[]): Promise<any[]> {
+  static allSettled<A = any>(values: readonly (A | Promise<A>)[]): Promise<A[]> {
     if (typeof (Promise as any).allSettled === 'undefined') {
       return PromiseWorker.all(values)
     }
@@ -147,13 +147,13 @@ export class PromiseWorker<T> implements Promise<T> {
     return Promise.reject(reason)
   }
 
-  static resolve(value?: any): Promise<any> {
+  static resolve<A = any>(value?: A | Promise<A>): Promise<A> {
     return Promise.resolve(value)
   }
 }
 
-export interface PromiseWorkerOptions {
-  workerData?: any,
+export interface PromiseWorkerOptions<T = any> {
+  workerData?: T,
   [option: string]: any
 }
 
