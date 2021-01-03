@@ -46,5 +46,4 @@ describe('class PromiseWorker', () => {
         chai.expect(result).to.eql(maxValues)
       })
   }).timeout(3500)
-  
 })
