@@ -4,7 +4,7 @@ export class PromiseWorker<T = any> implements Promise<T> {
       resolve: (value?: unknown) => void,
       reject: (reason?: any) => void
     ) => void,
-    options: PromiseWorkerOptions<T>
+    options: PromiseWorkerOptions
   ) {
     const { workerData } = this._internalOptions = options
     const thisRef = this
