@@ -118,3 +118,5 @@ dist
 esm
 index.js
 index.d.ts
+
+.npmrc
