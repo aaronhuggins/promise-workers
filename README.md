@@ -7,18 +7,21 @@ Promises and Async/Await patterns have greatly improved multi-tasking in JavaScr
 The library is usable in browsers and Node.JS. There are some differences which are [explained below](#supported-platforms-and-differences).
 
 - Node.JS: `const { PromiseWorker } = require('promise-workers')`
-- Tree-shaking with ESM: `import { PromiseWorker } from 'promise-workers/index.esm.js'`
-- Browser: `<script src="https://cdn.jsdelivr.net/npm/promise-workers@1.2.0/index.min.js"></script>`
+- TypeScript: `import { PromiseWorker } from 'promise-workers'`
+- Tree-shaking with ESM: `import { PromiseWorker } from 'promise-workers/esm/index.js'`
+- Browser: `<script type="module" src="https://cdn.jsdelivr.net/npm/promise-workers@2.0.0/esm/index.min.js"></script>`
+
+For use with TypeScript, it's recommended to install the optional dependency of `tslib`.
 
 ```javascript
 function workToDo (input) {
   return new PromiseWorker(function () {
     const data = workerData // Variable workerData is assigned as a constant in the worker context.
 
-    // Perform CPU intensive work...
+    // Perform CPU/time intensive work...
 
     return data
-  }, { workerData: input })
+  }, input)
 }
 
 async function main () {

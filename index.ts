@@ -8,10 +8,19 @@ export class PromiseWorker<T> implements Promise<T> {
   ) {
     const { workerData } = this._internalOptions = options
     const thisRef = this
+    try {
+      // Attempt a pre-import of optional `tslib` to cache ahead of calls made by typescript later.
+      require('tslib')
+    } catch (err) {}
 
     this._internalPromise = new Promise(function (resolve, reject) {
       if (typeof window === 'undefined') {
         thisRef._internalScript =
+          'let tslib = {}\n' +
+          'try {\n' +
+          '  tslib = require(\'tslib\')\n' +
+          '} catch (err) {}\n' +
+          'const { __importStar, __importDefault } = tslib\n' +
           'const workerThreads = require(\'worker_threads\')\n' +
           'const workerData = workerThreads.workerData\n' +
           'new Promise(' + executor.toString() + ')\n' +
