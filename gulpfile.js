@@ -33,11 +33,10 @@ gulp.task('compile:esm-test', async () => {
   fs.writeFileSync('./test/test-web.js', esmTestScript.join('\n'), 'utf8')
 })
 
-gulp.task('test', gulp.series('test:node', 'compile:esm-test', 'test:web'))
-
 gulp.task('compile:tsc', shell.task([
   'tsc',
   'tsc -p tsconfig.esm.json'
 ]))
 
 gulp.task('compile', gulp.parallel('compile:tsc', 'compile:esm-test'))
+gulp.task('test', gulp.series('compile', 'test:node', 'test:web'))
