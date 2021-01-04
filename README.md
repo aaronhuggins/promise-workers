@@ -7,15 +7,18 @@ Promises and Async/Await patterns have greatly improved multi-tasking in JavaScr
 The library is usable in browsers and Node.JS. There are some differences which are [explained below](#supported-platforms-and-differences).
 
 - Node.JS: `const { PromiseWorker } = require('promise-workers')`
-- Tree-shaking with ESM: `import { PromiseWorker } from 'promise-workers/index.esm.js'`
-- Browser: `<script src="https://cdn.jsdelivr.net/npm/promise-workers@1.2.0/index.min.js"></script>`
+- TypeScript: `import { PromiseWorker } from 'promise-workers'`
+- Tree-shaking with ESM: `import { PromiseWorker } from 'promise-workers/esm/index.js'`
+- Browser: `<script type="module" src="https://cdn.jsdelivr.net/npm/promise-workers@2.0.0/esm/index.min.js"></script>`
+
+For use with TypeScript, it's recommended to install the optional dependency of `tslib`.
 
 ```javascript
 function workToDo (input) {
   return new PromiseWorker(function () {
     const data = workerData // Variable workerData is assigned as a constant in the worker context.
 
-    // Perform CPU intensive work...
+    // Perform CPU/time intensive work...
 
     return data
   }, { workerData: input })
@@ -41,21 +44,17 @@ The `PromiseWorker` constructor accepts two arguments.
 - `executor`: **Required** The function passed to the worker for execution.
 - `workerData`: **Optional** Any JavaScript value which will be cloned to the worker as a local `workerData` variable.
 
-The `executor` function should be written as if it is self-contained code. It will be executed in the context of the worker and will only have access to the context of its own thread. The variable `workerData` is initialized as a constant in the worker context and cannot be re-assigned by the `executor` function. The `executor` function cannot reference anything from the thread that spawns the `PromiseWorker`.
+The `executor` function should be written as if it is self-contained code. It will be executed in the context of the worker and will only have access to the context of its own thread. The variable `workerData` is initialized as a constant in the worker context and cannot be re-assigned by the `executor` function. The `executor` function cannot reference anything from the parent thread that spawns the `PromiseWorker`.
 
-### new PromiseWorker(executor: () => any | void)
-
-Creates a worker with a synchronous function.
-
-### new PromiseWorker(executor: () => any | void, workerData: any)
-
-Creates a worker with a synchronous function; passes data to the local context as `const workerData`.
+### interface PromiseWorkerOptions<T = any>
+- `workerData: T` - The payload to pass into the worker context.
+- `[option: string]: any` - Any additional options to pass to the underlying worker.
 
 ### new PromiseWorker(executor: (resolve: (value?: unknown) => void, reject: (reason?: any) => void) => void)
 
 Creates a worker with a Promise to fulfill.
 
-### new PromiseWorker(executor: (resolve: (value?: unknown) => void, reject: (reason?: any) => void) => void, workerData: any)
+### new PromiseWorker(executor: (resolve: (value?: unknown) => void, reject: (reason?: any) => void) => void, options: PromiseWorkerOptions)
 
 Creates a worker with a Promise to fulfill; passes data to the local context as `const workerData`.
 

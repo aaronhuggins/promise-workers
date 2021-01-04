@@ -1,6 +1,6 @@
 {
   "name": "promise-workers",
-  "version": "1.2.0",
+  "version": "2.0.2",
   "description": "Promises + Workers = multi-threaded PromiseWorkers!",
   "keywords": [
     "nodejs",
@@ -14,15 +14,15 @@
     "multi threading"
   ],
   "main": "index.js",
-  "module": "index.esm.js",
+  "module": "esm/index.js",
   "types": "index.d.ts",
   "files": [
     "index.js",
     "index.d.ts",
-    "index.esm.js"
+    "esm/index.js"
   ],
   "scripts": {
-    "prepublish": "gulp compile",
+    "prepack": "gulp compile",
     "test": "gulp test",
     "build": "gulp compile"
   },
@@ -32,11 +32,23 @@
   },
   "author": "Aaron Huggins",
   "license": "MIT",
+  "optionalDependencies": {
+    "tslib": "^2.0.3"
+  },
   "devDependencies": {
+    "@types/node": "^14.14.19",
+    "@typescript-eslint/eslint-plugin": "^4.11.1",
     "chai": "^4.2.0",
+    "eslint": "^7.17.0",
+    "eslint-config-standard-with-typescript": "^19.0.1",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.1.0",
     "gulp": "^4.0.2",
-    "local-web-server": "^4.0.0",
+    "gulp-shell": "^0.8.0",
+    "local-web-server": "^4.2.1",
     "minimist": "^1.2.5",
-    "mocha": "^7.1.0"
+    "mocha": "^8.2.1"
   }
 }
